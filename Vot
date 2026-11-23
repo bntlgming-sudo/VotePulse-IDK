@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VotePulse — MLYSA Election Portal</title>
+  <style>
+    :root {
+      --navy: #10234b;
+      --blue: #164e9a;
+      --gold: #f4c542;
+      --slate: #f4f6fb;
+      --paper: #fbf9f4;
+      --cream: #f4efe4;
+      --emerald: #176638;
+      --crimson: #b42332;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--slate);
+      color: #17233e;
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      padding: 28px 20px;
+      color: white;
+      background: linear-gradient(120deg, #0d1a38, var(--blue));
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .header-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .gold {
+      color: var(--gold);
+    }
+
+    h1 {
+      margin: 8px 0;
+      font-size: 32px;
+    }
+
+    .countdown-card {
+      min-width: 280px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 14px;
+      background: rgba(255,255,255,.10);
+    }
+
+    .countdown-card small {
+      display: block;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    .timer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .timer div {
+      padding: 10px 5px;
+      border-radius: 8px;
+      background: white;
+      color: var(--navy);
+      text-align: center;
+    }
+
+    .timer strong {
+      display: block;
+      font-size: 20px;
+    }
+
+    .timer span {
+      font-size: 10px;
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+      padding: 12px;
+      background: white;
+    }
+
+    nav button {
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: #e8eef8;
+      color: #173c78;
+      font-weight: bold;
+    }
+
+    nav button.active {
+      background: #173c78;
+      color: white;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 25px auto;
+      padding: 0 15px;
+    }
+
+    .card {
+      margin-bottom: 20px;
+      padding: 20px;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      background: white;
+      box-shadow: 0 5px 20px rgba(16,35,75,.06);
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .primary-button {
+      margin-top: 10px;
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: var(--blue);
+      color: white;
+      font-weight: bold;
+    }
+
+    .primary-button:disabled {
+      cursor: not-allowed;
+      opacity: .45;
+    }
+
+    .ballot {
+      border: 4px solid #0f172a;
+      border-radius: 8px;
+      background: var(--paper);
+      color: #0f172a;
+    }
+
+    .ballot-header,
+    .ballot-footer {
+      padding: 16px;
+      background: var(--cream);
+      text-align: center;
+    }
+
+    .ballot-banner {
+      padding: 10px;
+      border-top: 2px solid #0f172a;
+      border-bottom: 2px solid #0f172a;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    .ballot-row {
+      display: grid;
+      grid-template-columns: 55% 20% 25%;
+      min-height: 100px;
+      border-bottom: 2px solid #0f172a;
+    }
+
+    .ballot-row:last-child {
+      border-bottom: 0;
+    }
+
+    .ballot-row > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+      border-right: 2px solid #0f172a;
+    }
+
+    .ballot-row > div:first-child {
+      justify-content: flex-start;
+    }
+
+    .ballot-row > div:last-child {
+      border-right: 0;
+    }
+
+    .stamp {
+      width: 48px;
+      height: 48px;
+      border: 3px solid #0f172a;
+      border-radius: 4px;
+      background: white;
+      color: #0f172a;
+      font-size: 30px;
+      font-weight: bold;
+    }
+
+    .stamp.selected {
+      background: #fff1b8;
+    }
+
+    .notice {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      background: #eaf7ef;
+      color: var(--emerald);
+    }
+
+    .error {
+      background: #fff0f0;
+      color: var(--crimson);
+    }
+
+    footer {
+      margin-top: 40px;
+      padding: 25px;
+      background: #0d1a38;
+      color: white;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .countdown-card {
+        min-width: 0;
+      }
+
+      nav {
+        flex-wrap: wrap;
+      }
+
+      .ballot-row {
+        font-size: 12px;
+      }
+
+      .stamp {
+        width: 38px;
+        height: 38px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container header-inner">
+      <div>
+        <span class="pill">Lembaga Pilihan Raya MLYSA</span>
+        <div class="pill">Official Election Portal</div>
+
+        <h1>VotePulse <span class="gold">·</span> Malaysia Election</h1>
+        <p>Pilihan Raya Umum Rasmi · Roblox Identity Verification · Borang 8 Ballot Paper</p>
+      </div>
+
+      <div class="countdown-card">
+        <small>POLL CLOSING COUNTDOWN · PRU 2026</small>
+        <div class="timer">
+          <div><strong id="days">00</strong><span>DAYS</span></div>
+          <div><strong id="hours">00</strong><span>HOURS</span></div>
+          <div><strong id="mins">00</strong><span>MINS</span></div>
+          <div><strong id="secs">00</strong><span>SECS</span></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <button class="active">Voter Portal (Borang 8)</button>
+    <button>Manifesto Comparising</button>
+    <button>Admin Portal (Staff Only)</button>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Voter Portal · Borang 8</h2>
+
+      <div class="card">
+        <h3>Roblox Identity Verification</h3>
+        <label for="username">Roblox Username</label>
+        <input id="username" placeholder="Enter Roblox username">
+        <button class="primary-button" onclick="verifyVoter()">Verify Username</button>
+        <div id="verification"></div>
+      </div>
+
+      <div class="ballot">
+        <div class="ballot-header">
+          <p><strong>Lembaga Pilihan Raya MLYSA</strong></p>
+          <p>Series Ballot: <strong>MY-SPR-1234567</strong></p>
+          <h2>BORANG 8 - Kertas Undi</h2>
+          <p id="ballotUsername">Username Roblox: Belum disahkan</p>
+        </div>
+
+        <div class="ballot-banner">
+          SILA PANGKAH SATU SAHAJA
+        </div>
+
+        <div class="ballot-row">
+          <div>
+            <strong>1. Parti Rakyat MLYSA</strong>
+          </div>
+          <div>PRM</div>
+          <div>
+            <button class="stamp" onclick="selectParty(this)"> </button>
+          </div>
+        </div>
+
+        <div class="ballot-row">
+          <div>
+            <strong>2. Parti Wawasan Negara</strong>
+          </div>
+          <div>WARESAN</div>
+          <div>
+            <button class="stamp" onclick="selectParty(this)"> </button>
+          </div>
+        </div>
+
+        <div class="ballot-row">
+          <div>
+            <strong>3. Parti Sejahtera Pembangunan</strong>
+          </div>
+          <div>PSP</div>
+          <div>
+            <button class="stamp" onclick="selectParty(this)"> </button>
+          </div>
+        </div>
+
+        <div class="ballot-footer">
+          <strong>SPR MLYSA · COP RASMI · 2026</strong>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Masukkan Kertas Undi Ke Dalam Peti Undi</h3>
+        <button id="submitVote" class="primary-button" disabled>
+          Submit Official Ballot
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <strong>VotePulse</strong>
+    <p>Lembaga Pilihan Raya MLYSA</p>
+    <p>Official Electoral Commission Demo</p>
+    <p>Borang 8 Digital Ballot</p>
+  </footer>
+
+  <script>
+    let verified = false;
+
+    function verifyVoter() {
+      const input = document.getElementById("username");
+      const username = input.value.trim();
+      const status = document.getElementById("verification");
+
+      if (!/^[A-Za-z0-9_]{3,20}$/.test(username)) {
+        status.innerHTML =
+          '<div class="notice error">Invalid Roblox username format.</div>';
+        return;
+      }
+
+      verified = true;
+      status.innerHTML =
+        '<div class="notice">Verified voter: @' + username + "</div>";
+
+      document.getElementById("ballotUsername").textContent =
+        "Username Roblox: @" + username;
+
+      document.getElementById("submitVote").disabled = false;
+    }
+
+    function selectParty(selectedStamp) {
+      if (!verified) {
+        document.getElementById("verification").innerHTML =
+          '<div class="notice error">Verify your username first.</div>';
+        return;
+      }
+
+      document.querySelectorAll(".stamp").forEach(stamp => {
+        stamp.textContent = "";
+        stamp.classList.remove("selected");
+      });
+
+      selectedStamp.textContent = "✕";
+      selectedStamp.classList.add("selected");
+    }
+
+    const closingDate = new Date();
+    closingDate.setDate(closingDate.getDate() + 30);
+
+    function updateCountdown() {
+      const remaining = closingDate - new Date();
+
+      if (remaining <= 0) {
+        document.querySelector(".countdown-card").innerHTML =
+          "<small>POLL CLOSING COUNTDOWN · PRU 2026</small>" +
+          "<strong>POLL CONCLUDED</strong>";
+        return;
+      }
+
+      const days = Math.floor(remaining / 86400000);
+      const hours = Math.floor(remaining / 3600000) % 24;
+      const minutes = Math.floor(remaining / 60000) % 60;
+      const seconds = Math.floor(remaining / 1000) % 60;
+
+      document.getElementById("days").textContent =
+        String(days).padStart(2, "0");
+      document.getElementById("hours").textContent =
+        String(hours).padStart(2, "0");
+      document.getElementById("mins").textContent =
+        String(minutes).padStart(2, "0");
+      document.getElementById("secs").textContent =
+        String(seconds).padStart(2, "0");
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
